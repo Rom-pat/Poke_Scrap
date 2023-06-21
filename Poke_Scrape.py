@@ -2,10 +2,8 @@
 """Poke_Scrape.py scraping serebii and bulbapedia"""
 from urllib.request import urlopen
 import requests
-import cv2
 import os
 import numpy as np
-from PIL import Image
 #import json
 import csv
 from bs4 import BeautifulSoup
@@ -44,15 +42,16 @@ def run_db_scrap():
     soup = BeautifulSoup(content, "html.parser")
     normal_mon = soup.find_all("img",{"class":"img-fixed shinydex-sprite shinydex-sprite-normal"})
     shiny_mon = soup.find_all("img",{"class":"img-fixed shinydex-sprite shinydex-sprite-shiny"})
+    os.mkdir("Pokemon_Home_JPEG")
     for mon in normal_mon: 
         r = requests.get(mon["src"])
-        file_name = os.path.join("Poke_pics",mon["src"].split("/")[-1])
+        file_name = os.path.join("Pokemon_Home_JPEG",mon["src"].split("/")[-1])
         with open(file_name,"wb") as f:
             for chunk in r:
                 f.write(chunk)
     for mon in shiny_mon:
         r = requests.get(mon["src"])
-        file_name = os.path.join("Poke_pics",mon["src"].split("/")[-1].replace(".jpg","-shiny.jpg"))
+        file_name = os.path.join("Pokemon_Home_JPEG",mon["src"].split("/")[-1].replace(".jpg","-shiny.jpg"))
         with open(file_name, 'wb') as f:
             for chunk in r:
                 f.write(chunk)
@@ -67,9 +66,10 @@ def run_bulb_scrap():
         soup = BeautifulSoup(content, "html.parser")
         images = soup.find_all("img")
         pages= soup.find_all("a", {"title": "Category:HOME artwork"})
+        os.mkdir("Pokemon_Home_PNG")
         for image in images[:-1]:
             r = requests.get(image["src"])
-            file_name = os.path.join("Home_pics",image["src"].split("/")[-2])
+            file_name = os.path.join("Pokemon_Home_PNG",image["src"].split("/")[-2])
             with open(file_name,"wb") as f:
                 for chunk in r:
                     f.write(chunk)
@@ -81,10 +81,9 @@ def run_bulb_scrap():
 
 
 def main(*args):
-    #remove the hashtag before running the desired function scrap. 
-    #run_serebi_Scrap()
-    #run_db_scrap()
-    #run_bulb_scrap()
+    run_serebi_Scrap()
+    run_db_scrap()
+    run_bulb_scrap()
 
 
 
