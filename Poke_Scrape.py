@@ -14,6 +14,7 @@ from bs4 import BeautifulSoup
 #useful site to scrap 
 
 def run_serebi_Scrap():
+    """serebii script scrapes all Pokemon information and uploads it as a CSV."""
     url = "https://www.serebii.net/pokemon/nationalpokedex.shtml"
     page = urlopen(url)
     html_bytes = page.read()
@@ -36,6 +37,7 @@ def run_serebi_Scrap():
             poke_Writer.writerow(info_dict)
 
 def run_db_scrap():
+    """db scrap returns all Pokemon Home Assets as JPEG."""
     url = "https://pokemondb.net/pokedex/shiny"
     page = requests.get(url)
     content =page.content
@@ -56,6 +58,7 @@ def run_db_scrap():
                 f.write(chunk)
 
 def run_bulb_scrap():
+    """Bulbpedia scrap will return all the Pokemon Home Assets as PNG. """
     #"https://archives.bulbagarden.net/w/index.php?title=Category:HOME_artwork&filefrom=%2A058%0AHOME0058H+s.png#mw-category-media"
     url= "https://archives.bulbagarden.net/w/index.php?title=Category:HOME_artwork"
     while url !="": 
@@ -75,14 +78,13 @@ def run_bulb_scrap():
             if page.text == "next page":
                 url="https://archives.bulbagarden.net"+page["href"]
                 break
-    print("hi")
 
 
-def main(*argv):
-    # if "Serebii" in argv:
-    # elif "Bulbapedia" in argv:
+def main(*args):
+    #remove the hashtag before running the desired function scrap. 
+    #run_serebi_Scrap()
     #run_db_scrap()
-    run_bulb_scrap()
+    #run_bulb_scrap()
 
 
 
