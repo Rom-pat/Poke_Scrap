@@ -7,4 +7,4 @@ opencv-python==4.7.0.72
 Pillow==10.0.1
 requests==2.31.0
 soupsieve==2.4.1
-urllib3==2.0.3
+urllib3==2.0.6
