@@ -49,7 +49,7 @@ def run_serebi_Scrap():
         pokedex_list.append(fix_serebii_info(info))
     return pokedex_list
 
-def run_db_scrap():
+def run_image_db_scrap():
     """db scrap returns all Pokemon Home Assets as JPEG."""
     url = "https://pokemondb.net/pokedex/shiny"
     page = requests.get(url)
@@ -71,7 +71,7 @@ def run_db_scrap():
             for chunk in r:
                 f.write(chunk)
 
-def run_bulb_scrap():
+def run_image_bulb_scrap():
     """Bulbpedia scrap will return all the Pokemon Home Assets as PNG. """
     #"https://archives.bulbagarden.net/w/index.php?title=Category:HOME_artwork&filefrom=%2A058%0AHOME0058H+s.png#mw-category-media"
     url= "https://archives.bulbagarden.net/w/index.php?title=Category:HOME_artwork"
@@ -95,7 +95,7 @@ def run_bulb_scrap():
                 break
 
 
-def run_bulb2_scrap(names):
+def run_bulb_scrap(names):
     """Bulb2 Scraps all possible Game locations of a Pokemon returns entire dex"""
     location_list = []
     for name in names:
@@ -130,12 +130,16 @@ def run_bulb2_scrap(names):
 def main(*args):
     Poke_info = Pokemon_info()
     df = pd.DataFrame(run_serebi_Scrap())
-    #run_db_scrap()
-    #run_bulb_scrap()
-    #location_list = run_bulb2_scrap(df["Name"])
+    #Image USES
+    #run_image_db_scrap()
+    #run_image_bulb_scrap()
+
+    # Gets DATA
+    #location_list = run_bulb_scrap(df["Name"])
     #df2 = pd.DataFrame(location_list,columns=location_list[0].keys())
     #df = pd.merge(df,df2, on="Name")
     #df.to_csv('Updated_pokemon.tsv',encoding='utf-8',index=False,sep="\t")
+    #Gets region data (can be seperate from top)
     scrape_all_regional_Dex(df)
 
 
@@ -165,6 +169,7 @@ def fix_serebii_info(info):
 
 
 def scrape_all_regional_Dex(df):
+    """Scraps all OBTAINABLE pokemon in that specific game/ region"""
     json_dex = {}
     json_dex["Red/Blue/Green/Yellow"] = json_dex ["Let's Go, Pikachu/Let's Go, Eevee"] = list(range(1,151))
     json_dex["Gold/Silver"] = list(Pokemon_info.pokedex[2].difference({1,2,3,4,5,6,7,8,9,138,139,140,141,144,145,146,150,151,251}))
@@ -189,6 +194,7 @@ def scrape_all_regional_Dex(df):
     dex_file.close()
 
 def Dex_region_Scrape(df,json_dex,names):
+    """Scraps all OBTAINABLE pokemon that are post gen 7"""
     number_set = set()
     Dex_regions = ["https://www.serebii.net/swordshield/galarpokedex.shtml", 
                "https://www.serebii.net/swordshield/isleofarmordex.shtml",
@@ -196,6 +202,7 @@ def Dex_region_Scrape(df,json_dex,names):
                "https://serebii.net/swordshield/pokemonnotindex.shtml",
                "https://www.serebii.net/scarletviolet/paldeapokedex.shtml",
                "https://www.serebii.net/scarletviolet/kitakamipokedex.shtml",
+               "https://www.serebii.net/scarletviolet/blueberrypokedex.shtml",
                "https://www.serebii.net/brilliantdiamondshiningpearl/sinnohpokedex.shtml",
                "https://www.serebii.net/brilliantdiamondshiningpearl/otherpokemon.shtml",
                "https://www.serebii.net/legendsarceus/hisuipokedex.shtml"]
@@ -229,13 +236,14 @@ def Dex_region_Scrape(df,json_dex,names):
             for pkmn in dex[2::4]:
                 name = pkmn.text.strip()
                 number_set.add(int(df.loc[df["Name"] == name]["pokedex_number"].values[0][1:]))
-            if dlc =="kitakamipokedex":
+            if dlc =="kitakamipokedex" or dlc=="blueberrypokedex":
                 json_dex["Scarlet/Violet DLC"] = json_dex["Scarlet/Violet DLC"] | number_set.copy()
             else: 
                 json_dex[names[game]]= number_set.copy()
     return json_dex
 
 def unavailable_scrape(df,json_dex, names):
+    """Scraps all OBTAINABLE pokemon that are gen 7 or previous"""
     unavailable_mons = ["https://www.serebii.net/ultrasunultramoon/unobtainable.shtml",
                         "https://www.serebii.net/sunmoon/unobtainable.shtml",
                         "https://www.serebii.net/omegarubyalphasapphire/unobtainable.shtml",
